@@ -8,14 +8,27 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var locationManager = LocationManager.shared
+    @StateObject private var vm = SearchResultsViewModel()
+    @State private var search: String = ""
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            VStack {
+                List(vm.places) { place in
+                    Text(place.name)
+                }
+            }
+            .searchable(text: $search)
+            .onChange(of: search) { searchText in
+                if !searchText.isEmpty {
+                    vm.search(text: searchText, region: locationManager.region)
+                } else {
+                    vm.places = []
+                }
+            }
+            .navigationTitle("Places")
         }
-        .padding()
     }
 }
 
